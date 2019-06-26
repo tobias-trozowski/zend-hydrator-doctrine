@@ -212,8 +212,7 @@ class DoctrineHydrator extends AbstractHydrator
                 $data[$dataFieldName] = $this->extractValue($fieldName, $object->$getter(), $object);
             } elseif (in_array($isser, $methods, true)) {
                 $data[$dataFieldName] = $this->extractValue($fieldName, $object->$isser(), $object);
-            } elseif (
-                strpos($fieldName, 'is') === 0
+            } elseif (strpos($fieldName, 'is') === 0
                 && in_array($fieldName, $methods, true)
                 && ctype_upper(substr($fieldName, 2, 1))
             ) {
@@ -296,8 +295,7 @@ class DoctrineHydrator extends AbstractHydrator
                         continue;
                     }
                     $value = $this->toOne($target, $this->hydrateValue($field, $value, $data));
-                    if (
-                        null === $value
+                    if (null === $value
                         && !current($metadata->getReflectionClass()->getMethod($setter)->getParameters())->allowsNull()
                     ) {
                         continue;
@@ -410,7 +408,7 @@ class DoctrineHydrator extends AbstractHydrator
                 $value,
                 array_flip($metadata->getIdentifier())
             );
-            $object = $this->find($identifiers, $target) ?: new $target;
+            $object = $this->find($identifiers, $target) ?: new $target();
             return $this->hydrate($value, $object);
         }
         return $this->find($value, $target);
@@ -438,6 +436,9 @@ class DoctrineHydrator extends AbstractHydrator
         $identifier = $metadata->getIdentifier();
         if (!is_array($values) && !$values instanceof Traversable) {
             $values = (array)$values;
+        }
+        if ($values instanceof Collection) {
+            $values = $values->toArray();
         }
         $collection = [];
         // If the collection contains identifiers, fetch the objects from database
@@ -479,7 +480,7 @@ class DoctrineHydrator extends AbstractHydrator
             if (!empty($find) && $found = $this->find($find, $target)) {
                 $collection[] = is_array($value) ? $this->hydrate($value, $found) : $found;
             } else {
-                $collection[] = is_array($value) ? $this->hydrate($value, new $target) : new $target;
+                $collection[] = is_array($value) ? $this->hydrate($value, new $target()) : new $target();
             }
         }
         $collection = array_filter(

@@ -1022,7 +1022,7 @@ final class DoctrineHydratorTest extends TestCase
 
     public function testHydrateOneToOneAssociationByValueUsingFullArrayForRelation()
     {
-        $entity = new Asset\OneToOneEntityNotNullable;
+        $entity = new Asset\OneToOneEntityNotNullable();
         $this->configureObjectManagerForOneToOneEntityNotNullable();
         // Use entity of id 1 as relation
         $data = ['toOne' => ['id' => 1, 'field' => 'foo']];
@@ -2289,11 +2289,15 @@ final class DoctrineHydratorTest extends TestCase
         $byValueDifferentiatorEntity->getTypeOfField('field')->willReturn('string');
         $byValueDifferentiatorEntity->hasAssociation(Argument::any())->willReturn(false);
         $byValueDifferentiatorEntity->getIdentifier()->willReturn(['id']);
-        $byValueDifferentiatorEntity->getIdentifierFieldNames(Argument::type(Asset\ByValueDifferentiatorEntity::class))->willReturn(['id']);
-        $byValueDifferentiatorEntity->getReflectionClass()->willReturn(new ReflectionClass(Asset\ByValueDifferentiatorEntity::class));
+        $byValueDifferentiatorEntity
+            ->getIdentifierFieldNames(Argument::type(Asset\ByValueDifferentiatorEntity::class))
+            ->willReturn(['id']);
+        $byValueDifferentiatorEntity->getReflectionClass()
+            ->willReturn(new ReflectionClass(Asset\ByValueDifferentiatorEntity::class));
         $objectManager = $this->prophesize(ObjectManager::class);
         $objectManager->getClassMetadata(Asset\OneToOneEntity::class)->will([$oneToOneMetadata, 'reveal']);
-        $objectManager->getClassMetadata(Asset\ByValueDifferentiatorEntity::class)->will([$byValueDifferentiatorEntity, 'reveal']);
+        $objectManager->getClassMetadata(Asset\ByValueDifferentiatorEntity::class)
+            ->will([$byValueDifferentiatorEntity, 'reveal']);
         $objectManager->find(Asset\OneToOneEntity::class, ['id' => 12])->willReturn(null);
         $objectManager->find(Asset\ByValueDifferentiatorEntity::class, ['id' => 13])->willReturn(null);
         return $objectManager->reveal();

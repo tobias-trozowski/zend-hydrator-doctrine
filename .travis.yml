@@ -20,17 +20,12 @@ matrix:
     - php: 7.3
       env:
         - DEPS=latest
-    - php: 7.4
+    - php: 7.4snapshot
       env:
         - DEPS=lowest
-    - php: 7.4
+    - php: 7.4snapshot
       env:
         - DEPS=latest
-    - php: nightly
-      env:
-        - DEPS=latest
-  allow_failures:
-    - php: nightly
 
 before_install:
   - travis_retry composer self-update
@@ -42,4 +37,5 @@ install:
   - composer show
 
 script:
+  - if [[ $TEST_COVERAGE == 'true' ]]; then composer test-coverage ; else composer test ; fi
   - if [[ $CHECK_CS == 'true' ]]; then composer cs-check ; fi
